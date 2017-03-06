@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>Graph Spectra</title>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Graph Spectra</h1>
+      <canvas id="graphCanvas" width="640" height="480"></canvas>
+      <div class="instructions">
+        Draw a graph and then click 'Get Spectrum' to see the spectrum of the selected matrix.
+        Click on an empty section of the canvas to create a vertex.
+        Click two vertices to create an edge.
+        Ctrl+click will remove a vertex and all incident edges.
+        <br /><br />
+        
+        <form method="POST" action="php/compute.php" id="adjacencySpectraForm" target="aSpectra">
+          <!-- Radio button options -->
+          <input type="radio" name="matrix" value="adjacency" checked>Adjacency</input><br />
+          <input type="radio" name="matrix" value="laplacian">Laplacian</input><br />
+          <input type="radio" name="matrix" value="normalized">Normalized Laplacian</input><br />
+  
+          <!-- Hidden fields modified by js -->
+          <input hidden id="formAdjacency" name="adjacency" />
+          <input hidden id="formLaplacian" name="laplacian" />
+          <input hidden id="formDiagonal"  name="diagonal"  />
+          <input hidden id="formNumVert"   name="numVert"   />
+          <input type="submit" value="Get Spectrum" />
+        </form>
+    
+        <!-- Frame for results -->
+        <iframe name="aSpectra" frameborder="0" id="resultFrame"></iframe>
+      </div>
+      <button onclick="reset_graph()">Clear Graph</button>
+      <button onclick="bipartite_double()">Bipartite Double Cover</button>
+    </div>
+    <script type="text/javascript" src="js/graphScript.js"></script>
+  </body>
+</html>
