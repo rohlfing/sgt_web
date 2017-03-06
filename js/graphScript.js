@@ -3,11 +3,9 @@ var graphContext = graphCanvas.getContext('2d');
 
 /* Form fields */
 var form_adjacency = document.getElementById('formAdjacency');
-var form_laplacian = document.getElementById('formLaplacian');
 var form_diagonal  = document.getElementById('formDiagonal');
 var form_num_vert  = document.getElementById('formNumVert');
 form_adjacency.value = "";
-form_laplacian.value = "";
 form_diagonal .value = "";
 form_num_vert .value = "";
 
@@ -78,18 +76,15 @@ var Edge = function(v1, v2, i){
 
 function write_command(){
   var adjacency_string;
-  var laplacian_string;
   var  diagonal_string;
 
   /* Start strings */
   adjacency_string = "{";
-  laplacian_string = "{";
    diagonal_string = "{";
 
   /* For each row of the matrices */
   for (var i = 0; i < adjacency.length; ++i){
     adjacency_string += "{";
-    laplacian_string += "{";
 
     /* Add element to degree vector */
     diagonal_string += vertices[i].degree;
@@ -100,28 +95,22 @@ function write_command(){
     /* For each element of the row */
     for (var j = 0; j < adjacency[0].length; ++j){
       adjacency_string += adjacency[i][j];
-      laplacian_string += (i == j) ? vertices[i].degree : -adjacency[i][j];
       if (j < adjacency[0].length - 1){
         adjacency_string += ",";
-        laplacian_string += ",";
       }
     }
 
     /* End the row */
     adjacency_string += "}";
-    laplacian_string += "}";
     if (i < adjacency.length - 1){
       adjacency_string += ",";
-      laplacian_string += ",";
     }
   }
 
   /* End strings; set form values */
   adjacency_string += "}";
-  laplacian_string += "}";
    diagonal_string += "}";
   form_adjacency.value = adjacency_string;
-  form_laplacian.value = laplacian_string;
   form_diagonal .value =  diagonal_string;
   form_num_vert .value = n;
 }

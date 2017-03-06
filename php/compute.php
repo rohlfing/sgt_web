@@ -13,7 +13,6 @@ function valid_chars($string){
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
   $adjacency = $_POST["adjacency"];
-  $laplacian = $_POST["laplacian"];
   $diagonal  = $_POST["diagonal"];
   $num_vert  = $_POST["numVert"];
   $matrix    = $_POST["matrix"];
@@ -21,8 +20,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
   if ($matrix == "adjacency" && valid_chars($adjacency)){
     $wolf_command = "Eigenvalues[" . $adjacency . "] // N";
   }
-  elseif ($matrix == "laplacian" && valid_chars($laplacian)){
-    $wolf_command = "Eigenvalues[" . $laplacian . "] // N";
+  elseif ($matrix == "laplacian" && valid_chars($adjacency) && valid_chars($diagonal)){
+    $wolf_command = "Eigenvalues[DiagonalMatrix[" . $diagonal . "] - " . $adjacency . "] // N";
   }
   elseif ($matrix == "normalized" && valid_chars($num_vert) && valid_chars($diagonal) && valid_chars($adjacency)){
     $wolf_command = "Eigenvalues[IdentityMatrix["
