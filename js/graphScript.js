@@ -266,6 +266,24 @@ function bipartite_double(){
   write_command();
 }
 
+function petersen(){
+  var rads, mag;
+  reset_graph();
+
+  for (var i = 0; i < 10; ++i){
+    rads = -2*Math.PI/4 + 2*Math.PI*(i % 5)/5;
+    mag  = 75 + (Math.floor(i / 5) * 75);
+    make_vertex(Math.floor(mag * Math.cos(rads) + 320), Math.floor(mag * Math.sin(rads) + 240));
+  } 
+  for (var i = 0; i < 5; ++i){
+    make_edge(vertices[i], vertices[(i + 2) % 5]); // Star
+    make_edge(vertices[i + 5], vertices[(i + 1) % 5 + 5]); // Pentagon
+    make_edge(vertices[i], vertices[i + 5]); // Connection
+  }
+
+  write_command();
+}
+
 graphCanvas.addEventListener("click", function (e){
   var x = e.pageX - this.offsetLeft;
   var y = e.pageY - this.offsetTop;

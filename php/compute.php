@@ -38,10 +38,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
   /* echo $wolf_command . "<br />"; */
 
   $term_command = "echo '" . $wolf_command . "' | wolfram";
+
+  // For python
+  //$term_command = "echo 'from numpy import linalg; from numpy import round; print(sorted(round(linalg.eigvals(" . $adjacency . ").real, 100), reverse=True))' | python";
   error_log($term_command);  
   //$grep_command = "(" . $term_command . ") | grep -o \"{.*}\"";
 
   exec($term_command, $outputs);
+  //system($term_command);
 
   /* Debug again */
   /*
@@ -54,7 +58,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
    */
   
-
   if (strpos($outputs[5], "Out[1]") === False){
     echo "Error!<br />";
   }
