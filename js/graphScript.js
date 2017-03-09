@@ -54,6 +54,8 @@ function redraw_graph(){
 function reset_graph(){
   n = 0;
   num_edges = 0;
+  prev = null;
+  clicked = 0;
   edges = [];
   vertices = [];
   adjacency = [];
