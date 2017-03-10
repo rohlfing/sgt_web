@@ -12,14 +12,15 @@
         Draw a graph and then click 'Get Spectrum' to see the spectrum of the selected matrix.
         Click on an empty section of the canvas to create a vertex.
         Click two vertices to create an edge.
-        Ctrl+click will remove a vertex and all incident edges.
+        Ctrl+click on a vertex will remove a vertex and all incident edges.
+        Ctrl+click near teh midpoint of an edge will remove the edge.
         <br /><br />
         
         <form method="POST" action="php/compute.php" id="adjacencySpectraForm" target="aSpectra">
           <!-- Radio button options -->
-          <input type="radio" name="matrix" value="adjacency" checked>Adjacency</input><br />
-          <input type="radio" name="matrix" value="laplacian">Laplacian</input><br />
-          <input type="radio" name="matrix" value="normalized">Normalized Laplacian</input><br />
+          <input type="radio" name="matrix" value="adjacency" checked />Adjacency<br />
+          <input type="radio" name="matrix" value="laplacian" />Laplacian<br />
+          <input type="radio" name="matrix" value="normalized" />Normalized Laplacian<br />
   
           <!-- Hidden fields modified by js -->
           <input hidden id="formAdjacency" name="adjacency" />
@@ -34,6 +35,7 @@
       <button onclick="reset_graph()">Clear Graph</button>
       <button onclick="petersen()">Petersen Graph</button>
       <button onclick="bipartite_double()">Bipartite Double Cover</button>
+      <button onclick="complete()">Complete Graph</button>
     </div>
     <script type="text/javascript" src="js/graphScript.js"></script>
   </body>

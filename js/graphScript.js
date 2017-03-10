@@ -49,6 +49,10 @@ function redraw_graph(){
   edges.forEach(function(e){
     draw_edge(e.v1, e.v2);
   });
+
+  if (prev){
+    draw_vertex(prev.x, prev.y, "red");
+  }
 }
 
 function reset_graph(){
@@ -136,11 +140,13 @@ var make_vertex = function(x, y){
   }
 }
 
-var make_edge = function(v1, v2){
-  for (var i = 0; i < num_edges; ++i){
-    if ((edges[i].v1 == v1 && edges[i].v2 == v2) ||
-        (edges[i].v2 == v1 && edges[i].v1 == v2))
-      return;
+function make_edge(v1, v2, check){
+  if (check == 1 || check === undefined){
+    for (var i = 0; i < num_edges; ++i){
+      if ((edges[i].v1 == v1 && edges[i].v2 == v2) ||
+          (edges[i].v2 == v1 && edges[i].v1 == v2))
+        return;
+    }
   }
 
   edges.push(new Edge(v1, v2, num_edges));
@@ -288,6 +294,18 @@ function petersen(){
   write_command();
 }
 
+function complete(){
+  for (var i = 0; i < n - 1; ++i){
+    for (var j = i + 1; j < n; ++j){
+      if (adjacency[i][j] == 0){
+        make_edge(vertices[i], vertices[j]);
+      }
+    }
+  }
+
+  write_command();
+}
+
 graphCanvas.addEventListener("click", function (e){
   var x = e.pageX - this.offsetLeft;
   var y = e.pageY - this.offsetTop;
@@ -324,6 +342,9 @@ graphCanvas.addEventListener("click", function (e){
   else {
     if (i == vertices.length){
       make_vertex(x, y);
+      if (clicked){
+        select_vertex(vertices[n - 1]);
+      }
       write_command();
     }
   }
