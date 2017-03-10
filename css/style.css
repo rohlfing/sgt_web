@@ -12,7 +12,7 @@ canvas#graphCanvas {
 
 iframe#resultFrame {
   width: 338px;
-  overflow: none;
+  overflow: visible; 
 }
 
 div.content {
