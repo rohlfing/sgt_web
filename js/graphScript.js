@@ -74,6 +74,8 @@ var Edge = function(v1, v2, i){
   this.v1 = v1;
   this.v2 = v2;
   this.index = i;
+  this.mid_x = (v1.x + v2.x) / 2;
+  this.mid_y = (v1.y + v2.y) / 2;
 }
 
 function write_command(){
@@ -291,6 +293,7 @@ graphCanvas.addEventListener("click", function (e){
   var y = e.pageY - this.offsetTop;
   var i = 0;
 
+  /* Select, connect, or remove vertex */
   for (i = 0; i < vertices.length; ++i){
     if (close_to(x, y, vertices[i].x, vertices[i].y, 14)){
       // Ctrl-click removes vertex
@@ -305,8 +308,23 @@ graphCanvas.addEventListener("click", function (e){
     }
   }
 
-  if (i == vertices.length){
-    make_vertex(x, y);
-    write_command();
+  /* Remove edge */
+  if (e.ctrlKey){
+    for (i = 0; i < edges.length; ++i){
+      if (close_to(x, y, edges[i].mid_x, edges[i].mid_y, 25)){
+        remove_edge(edges[i]);
+        write_command();
+        redraw_graph();
+        return;
+      }
+    }
+  }
+  
+  /* Add vertex */
+  else {
+    if (i == vertices.length){
+      make_vertex(x, y);
+      write_command();
+    }
   }
 });
