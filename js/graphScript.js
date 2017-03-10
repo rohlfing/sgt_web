@@ -81,37 +81,37 @@ function write_command(){
   var  diagonal_string;
 
   /* Start strings */
-  adjacency_string = "{";
-   diagonal_string = "{";
+  adjacency_string = "";//{";
+   diagonal_string = "";//{";
 
   /* For each row of the matrices */
   for (var i = 0; i < adjacency.length; ++i){
-    adjacency_string += "{";
+//    adjacency_string += "{";
 
     /* Add element to degree vector */
     diagonal_string += vertices[i].degree;
     if (i < adjacency.length - 1){
-      diagonal_string += ",";
+      diagonal_string += " ";
     }
 
     /* For each element of the row */
     for (var j = 0; j < adjacency[0].length; ++j){
       adjacency_string += adjacency[i][j];
-      if (j < adjacency[0].length - 1){
-        adjacency_string += ",";
-      }
+//      if (j < adjacency[0].length - 1){
+        adjacency_string += " ";
+//      }
     }
 
     /* End the row */
-    adjacency_string += "}";
+//    adjacency_string += "}";
     if (i < adjacency.length - 1){
-      adjacency_string += ",";
+//      adjacency_string += " ";
     }
   }
 
   /* End strings; set form values */
-  adjacency_string += "}";
-   diagonal_string += "}";
+//  adjacency_string += "}";
+//   diagonal_string += "}";
   form_adjacency.value = adjacency_string;
   form_diagonal .value =  diagonal_string;
   form_num_vert .value = n;

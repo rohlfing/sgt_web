@@ -17,6 +17,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
   $num_vert  = $_POST["numVert"];
   $matrix    = $_POST["matrix"];
 
+/*
   if ($matrix == "adjacency" && valid_chars($adjacency)){
     $wolf_command = "Eigenvalues[" . $adjacency . "] // N";
   }
@@ -33,19 +34,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     echo "INVALID INPUT!<br />";
     return;
   }
-
+ */
   /* Debug print of command passed to wolfram */
   /* echo $wolf_command . "<br />"; */
 
-  $term_command = "echo '" . $wolf_command . "' | wolfram";
+  system("export LD_LIBRARY_PATH=/usr/local/lib");
+  //  $term_command = "echo '" . $wolf_command . "' | wolfram";
+  $term_command = "echo '" . $matrix . " " . $num_vert . " " . $diagonal . " " . $adjacency . "' | spectre";
 
   // For python
   //$term_command = "echo 'from numpy import linalg; from numpy import round; print(sorted(round(linalg.eigvals(" . $adjacency . ").real, 100), reverse=True))' | python";
   error_log($term_command);  
   //$grep_command = "(" . $term_command . ") | grep -o \"{.*}\"";
 
-  exec($term_command, $outputs);
-  //system($term_command);
+  //exec($term_command, $outputs);
+  system($term_command);
 
   /* Debug again */
   /*
@@ -57,7 +60,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     //}
   }
    */
-  
+
+ /* 
   if (strpos($outputs[5], "Out[1]") === False){
     echo "Error!<br />";
   }
@@ -70,5 +74,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     echo $spectrum;
   }
+  */
 }
 ?>
