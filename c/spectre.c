@@ -1,5 +1,6 @@
 #include <gsl/gsl_eigen.h>
 #include <math.h>
+#include "graph.h"
 
 #define DEBUG 0
 
@@ -12,7 +13,9 @@
 typedef enum {
   ADJACENCY,
   LAPLACIAN,
-  NORMALIZED
+  NORMALIZED,
+  DISTANCE,
+  FLIPPED
 } matrix_e;
 
 void print_individual(double value, int mult){
@@ -63,7 +66,9 @@ int main(int argc, char* argv[]){
   int i, j, n, x, y;
   double new_element;
   char matrix_type[12];
+  char graph;
   int* degrees;
+  graph_t g;
   matrix_e matrix;
   gsl_eigen_symm_workspace *w_s;
   gsl_eigen_nonsymm_workspace *w_ns;
@@ -76,6 +81,7 @@ int main(int argc, char* argv[]){
   putenv("LD_LIBRARY_PATH=/usr/local/lib");
 
   /* Determine the necessary matrix type */
+  graph = 0;
   scanf(" %s", matrix_type);
   if (!strcmp("adjacency", matrix_type)){
     matrix = ADJACENCY;
@@ -86,6 +92,10 @@ int main(int argc, char* argv[]){
   else if (!strcmp("normalized", matrix_type)){
     matrix = NORMALIZED;
   }
+  else if (!strcmp("distance", matrix_type)){
+    matrix = DISTANCE;
+    graph  = 1;
+  }
   else{
     printf("Error: Unsupported matrix type\n");
     return EMATRIXTYPE;
@@ -94,6 +104,15 @@ int main(int argc, char* argv[]){
   /* Get number of vertices and edges */
   scanf(" %d", &n);
   if (n <= 0) return EBADSIZE;
+  if (n > 256){
+    printf("Too many vertices: current limit is 256.\n");
+    return 0;
+  }
+
+  /* Make graph if necessary */
+  if (graph){
+    graph_init(&g, n);
+  }
 
   /* allocate the result vector and adjacency matrix */
   eigenvalues = gsl_vector_alloc(n);
@@ -110,6 +129,10 @@ int main(int argc, char* argv[]){
     gsl_matrix_set(A, y, x, 1);
     ++degrees[x];
     ++degrees[y];
+
+    if (graph){
+      graph_add_edge(&g, x, y);
+    }
   }
 
   /* Calculate eigenvalues of A */
@@ -175,11 +198,31 @@ int main(int argc, char* argv[]){
 
     print_evals(&eigenvalues_view.vector, n, 1, 0);
   }
+  
+  /* Calculate eigenvalues of A */
+  if (matrix == DISTANCE){
+    w_s = gsl_eigen_symm_alloc(n);
+    gsl_eigen_symm(A, eigenvalues, w_s);
+    gsl_eigen_symm_free(w_s);
+
+    if (!graph_is_connected(&g)){
+      printf("Graph must be connected\n");
+      return 0;
+    }
+   
+    // TODO 
+    printf("Distance matrices not yet supported\n");
+    //print_evals(eigenvalues, n, 0, 1);
+  }
 
   gsl_matrix_free(A);
   free(degrees);
 
   gsl_vector_free(eigenvalues);
+
+  if(graph){
+    graph_free(&g);
+  }
 
   return 0;
 }
