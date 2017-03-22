@@ -2,12 +2,10 @@ var graphCanvas  = document.getElementById('graphCanvas');
 var graphContext = graphCanvas.getContext('2d');
 
 /* Form fields */
-var form_adjacency = document.getElementById('formAdjacency');
-var form_diagonal  = document.getElementById('formDiagonal');
-var form_num_vert  = document.getElementById('formNumVert');
-form_adjacency.value = "";
-form_diagonal .value = "";
-form_num_vert .value = "";
+var form_edges = document.getElementById('formEdges');
+var form_nvert  = document.getElementById('formNumVert');
+form_edges.value = "";
+form_nvert.value = "";
 
 /* State variables */
 var prev = null;
@@ -20,7 +18,7 @@ var n = 0;
 var num_edges = 0;
 var adjacency = []; /* Adjacency Matrix of graph */
 
-var draw_vertex = function(x, y, color){
+function draw_vertex(x, y, color){
   var c = graphContext;
   c.beginPath();
   c.lineWidth = "2";
@@ -30,7 +28,7 @@ var draw_vertex = function(x, y, color){
   c.stroke();
 }
 
-var draw_edge = function(v1, v2){
+function draw_edge(v1, v2){
   var c = graphContext;
   c.beginPath();
   c.lineWidth = "1";
@@ -67,14 +65,14 @@ function reset_graph(){
   write_command();
 }
 
-var Vertex = function(x, y, i){
+function Vertex(x, y, i){
   this.x = x;
   this.y = y;
   this.degree = 0;
   this.index = i;
 }
 
-var Edge = function(v1, v2, i){
+function Edge(v1, v2, i){
   this.v1 = v1;
   this.v2 = v2;
   this.index = i;
@@ -83,47 +81,20 @@ var Edge = function(v1, v2, i){
 }
 
 function write_command(){
-  var adjacency_string;
-  var  diagonal_string;
+  var edges_string;
 
-  /* Start strings */
-  adjacency_string = "";//{";
-   diagonal_string = "";//{";
-
-  /* For each row of the matrices */
-  for (var i = 0; i < adjacency.length; ++i){
-//    adjacency_string += "{";
-
-    /* Add element to degree vector */
-    diagonal_string += vertices[i].degree;
-    if (i < adjacency.length - 1){
-      diagonal_string += " ";
-    }
-
-    /* For each element of the row */
-    for (var j = 0; j < adjacency[0].length; ++j){
-      adjacency_string += adjacency[i][j];
-//      if (j < adjacency[0].length - 1){
-        adjacency_string += " ";
-//      }
-    }
-
-    /* End the row */
-//    adjacency_string += "}";
-    if (i < adjacency.length - 1){
-//      adjacency_string += " ";
-    }
+  edges_string = "";
+ 
+  for (var i = 0; i < edges.length; ++i){
+    edges_string += edges[i].v1.index + " " + edges[i].v2.index + " ";
   }
 
-  /* End strings; set form values */
-//  adjacency_string += "}";
-//   diagonal_string += "}";
-  form_adjacency.value = adjacency_string;
-  form_diagonal .value =  diagonal_string;
-  form_num_vert .value = n;
+  /* Set form values */
+  form_edges.value = edges_string;
+  form_nvert.value = n;
 }
 
-var make_vertex = function(x, y){
+function make_vertex(x, y){
   draw_vertex(x, y, "black");
   vertices.push(new Vertex(x, y, n));
   
@@ -263,8 +234,8 @@ function bipartite_double(){
 
   /* Make new edges */
   for (var i = 0; i < old_num_edges; ++i){
-    make_edge(edges[i].v1, vertices[edges[i].v2.index + old_n]);
-    make_edge(edges[i].v2, vertices[edges[i].v1.index + old_n]);
+    make_edge(edges[i].v1, vertices[edges[i].v2.index + old_n], 0);
+    make_edge(edges[i].v2, vertices[edges[i].v1.index + old_n], 0);
   }
 
   /* Delete old edges */
@@ -286,19 +257,20 @@ function petersen(){
     make_vertex(Math.floor(mag * Math.cos(rads) + 320), Math.floor(mag * Math.sin(rads) + 240));
   } 
   for (var i = 0; i < 5; ++i){
-    make_edge(vertices[i], vertices[(i + 2) % 5]); // Star
-    make_edge(vertices[i + 5], vertices[(i + 1) % 5 + 5]); // Pentagon
-    make_edge(vertices[i], vertices[i + 5]); // Connection
+    make_edge(vertices[i], vertices[(i + 2) % 5], 0); // Star
+    make_edge(vertices[i + 5], vertices[(i + 1) % 5 + 5], 0); // Pentagon
+    make_edge(vertices[i], vertices[i + 5], 0); // Connection
   }
 
   write_command();
 }
 
+// TODO this is the only remainy function using A
 function complete(){
   for (var i = 0; i < n - 1; ++i){
     for (var j = i + 1; j < n; ++j){
       if (adjacency[i][j] == 0){
-        make_edge(vertices[i], vertices[j]);
+        make_edge(vertices[i], vertices[j], 0);
       }
     }
   }

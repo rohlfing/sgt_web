@@ -3,9 +3,10 @@
 
 #define DEBUG 0
 
-#define EMATRIXTYPE  -1
-#define EINSUFFINPUT -2
-#define EBADSIZE     -4
+#define EMATRIXTYPE  1
+#define EINSUFFINPUT 2
+#define EBADSIZE     4
+#define ENOSUCHVTX   8
 #define TOLERANCE 0.0001
 
 typedef enum {
@@ -59,7 +60,7 @@ void print_evals(gsl_vector* values, int n, char asc, char abs){
 }
 
 int main(int argc, char* argv[]){
-  int i, j, n, x;
+  int i, j, n, x, y;
   double new_element;
   char matrix_type[12];
   int* degrees;
@@ -90,28 +91,25 @@ int main(int argc, char* argv[]){
     return EMATRIXTYPE;
   }
 
-  /* Get dimension of the matrix */
+  /* Get number of vertices and edges */
   scanf(" %d", &n);
   if (n <= 0) return EBADSIZE;
 
   /* allocate the result vector and adjacency matrix */
   eigenvalues = gsl_vector_alloc(n);
-  A = gsl_matrix_alloc(n, n);
-  degrees = malloc(n * sizeof(int));
+  A = gsl_matrix_calloc(n, n);
+  degrees = calloc(n, sizeof(int));
 
-  /* Scan in degrees */
-  for (i = 0; i < n; ++i){
-    scanf(" %d", &(degrees[i]));
-  }
-
-  if (DEBUG){
-    printf("Scanned in degrees\n");
-  }
-
-  /* Scan in adjacency matrix */
-  for (i = 0; i < n*n; ++i){
-    scanf(" %d", &x);
-    gsl_matrix_set(A, i / n, i % n, x);
+  /* Scan in edges */
+  while(scanf(" %d %d", &x, &y) == 2){
+    if (x < 0 || y < 0 || x >= n || y >= n){
+      printf("Error: Bad edge");
+      return ENOSUCHVTX;
+    }
+    gsl_matrix_set(A, x, y, 1);
+    gsl_matrix_set(A, y, x, 1);
+    ++degrees[x];
+    ++degrees[y];
   }
 
   /* Calculate eigenvalues of A */

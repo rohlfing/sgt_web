@@ -2,6 +2,7 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta charset="UTF-8">
     <title>Graph Spectra</title>
   </head>
   <body>
@@ -18,13 +19,14 @@
         
         <form method="POST" action="php/compute.php" id="adjacencySpectraForm" target="aSpectra">
           <!-- Radio button options -->
-          <input type="radio" name="matrix" value="adjacency" checked />Adjacency<br />
-          <input type="radio" name="matrix" value="laplacian" />Laplacian<br />
-          <input type="radio" name="matrix" value="normalized" />Normalized Laplacian<br />
+          <input type="radio" name="matrix" value="adjacency" checked /><b>A</b>djacency<br />
+          <input type="radio" name="matrix" value="laplacian" /><b>L</b>aplacian<br />
+          <input type="radio" name="matrix" value="normalized" />Normalized <b>&Lfr;</b>aplacian<br />
+          <input type="radio" name="matrix" value="distance" /><b>&Dfr;</b>istance (Not yet implemented)<br />
+          <input type="radio" name="matrix" value="flipped" /><div class="flip"><b>&Dfr;</b></div>istance (flipped)(Not yet implemented)<br />
   
           <!-- Hidden fields modified by js -->
-          <input hidden id="formAdjacency" name="adjacency" />
-          <input hidden id="formDiagonal"  name="diagonal"  />
+          <input hidden id="formEdges" name="edges" />
           <input hidden id="formNumVert"   name="numVert"   />
           <input type="submit" value="Get Spectrum" />
         </form>

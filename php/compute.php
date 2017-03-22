@@ -12,8 +12,7 @@ function valid_chars($string){
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $adjacency = $_POST["adjacency"];
-  $diagonal  = $_POST["diagonal"];
+  $edges     = $_POST["edges"];
   $num_vert  = $_POST["numVert"];
   $matrix    = $_POST["matrix"];
 
@@ -40,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   system("export LD_LIBRARY_PATH=/usr/local/lib");
   //  $term_command = "echo '" . $wolf_command . "' | wolfram";
-  $term_command = "echo '" . $matrix . " " . $num_vert . " " . $diagonal . " " . $adjacency . "' | spectre";
+  $term_command = "echo '" . $matrix . " " . $num_vert . " " . $edges . "' | spectre";
 
   // For python
   //$term_command = "echo 'from numpy import linalg; from numpy import round; print(sorted(round(linalg.eigvals(" . $adjacency . ").real, 100), reverse=True))' | python";
