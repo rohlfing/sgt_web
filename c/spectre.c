@@ -62,12 +62,18 @@ void print_evals(gsl_vector* values, int n, char asc, char abs){
   print_individual(last_eval, multiplicity);
 }
 
+/* Function to be used as bfs or dfs callback */
+void print_visited(int v){
+  printf("visited node %d<br />\n", v);
+}
+
 int main(int argc, char* argv[]){
   int i, j, n, x, y;
   double new_element;
   char matrix_type[12];
   char graph;
   int* degrees;
+  int* distances;
   graph_t g;
   matrix_e matrix;
   gsl_eigen_symm_workspace *w_s;
@@ -94,6 +100,10 @@ int main(int argc, char* argv[]){
   }
   else if (!strcmp("distance", matrix_type)){
     matrix = DISTANCE;
+    graph  = 1;
+  }
+  else if (!strcmp("flipped", matrix_type)){
+    matrix = FLIPPED;
     graph  = 1;
   }
   else{
@@ -199,20 +209,47 @@ int main(int argc, char* argv[]){
     print_evals(&eigenvalues_view.vector, n, 1, 0);
   }
   
-  /* Calculate eigenvalues of A */
-  if (matrix == DISTANCE){
-    w_s = gsl_eigen_symm_alloc(n);
-    gsl_eigen_symm(A, eigenvalues, w_s);
-    gsl_eigen_symm_free(w_s);
+  /* Calculate eigenvalues of D */
+  else if (matrix == DISTANCE){
 
     if (!graph_is_connected(&g)){
       printf("Graph must be connected\n");
       return 0;
     }
-   
-    // TODO 
-    printf("Distance matrices not yet supported\n");
-    //print_evals(eigenvalues, n, 0, 1);
+
+    distances = malloc(n * sizeof(int));
+
+    for (i = 0; i < n; ++i){
+      graph_bfs(&g, i, distances, NULL);
+      for (j = 0; j < n; ++j){
+        gsl_matrix_set(A, i, j, distances[j]);
+      }
+    }
+
+    free(distances);
+    w_s = gsl_eigen_symm_alloc(n);
+    gsl_eigen_symm(A, eigenvalues, w_s);
+    gsl_eigen_symm_free(w_s);
+    print_evals(eigenvalues, n, 0, 1);
+  }
+  
+  /* Calculate eigenvalues of D (flipped) */
+  else if (matrix == FLIPPED){
+
+    distances = malloc(n * sizeof(int));
+
+    for (i = 0; i < n; ++i){
+      graph_bfs(&g, i, distances, NULL);
+      for (j = 0; j < n; ++j){
+        gsl_matrix_set(A, i, j, distances[j] > 0 ? (1.0/distances[j]) : 0);
+      }
+    }
+
+    free(distances);
+    w_s = gsl_eigen_symm_alloc(n);
+    gsl_eigen_symm(A, eigenvalues, w_s);
+    gsl_eigen_symm_free(w_s);
+    print_evals(eigenvalues, n, 0, 1);
   }
 
   gsl_matrix_free(A);

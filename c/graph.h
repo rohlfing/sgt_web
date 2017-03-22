@@ -17,6 +17,8 @@ void graph_init(graph_t* g, int n);
 
 void graph_add_edge(graph_t* g, int v1, int v2);
 
+void graph_bfs(graph_t* g, int v, int* distances, void (*action)(int));
+
 void graph_dfs(graph_t* g, int v, void (*action)(int));
 
 int graph_is_connected(graph_t* g);

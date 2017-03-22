@@ -37,6 +37,47 @@ void graph_add_edge(graph_t* g, int v1, int v2){
   add_edge(g, v2, v1);
 }
 
+void bfs_recursive(graph_t* g, int v, int* distances, int* vtx_q, int head, int tail, void (*action)(int)){
+  int i;
+
+  if (action){
+    action(v);
+  }
+
+  for(i = 0; i < g->num_edges[v]; ++i){
+    if (distances[g->edges[v][i]] < 0){
+      vtx_q[tail] = g->edges[v][i];
+      distances[vtx_q[tail]] = distances[v] + 1;
+      ++tail;
+    }
+  }
+
+  if (tail == head){
+    return;
+  }
+
+  else {
+    bfs_recursive(g, vtx_q[head], distances, vtx_q, head + 1, tail, action);
+  }
+}
+
+void graph_bfs(graph_t* g, int v, int* distances, void (*action)(int)){
+  int* vtx_q;
+  int i;
+
+  if (g->n <= 0)
+    return;
+
+  for (i = 0; i < g->n; ++i){
+    distances[i] = -1;
+  }
+  distances[v] = 0;
+
+  vtx_q = malloc(g->n * sizeof(int));
+  bfs_recursive(g, v, distances, vtx_q, 0, 0, action);
+  free(vtx_q);
+}
+
 void dfs(graph_t* g, int v, char* visited, void (*action)(int)){
   int i;
 
