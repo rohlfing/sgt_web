@@ -111,12 +111,16 @@ function make_vertex(x, y){
   }
 }
 
-function make_edge(v1, v2, check){
-  if (check == 1 || check === undefined){
+function make_edge(v1, v2, check, toggle){
+  if (check == 1 || check === undefined || toggle == 1){
     for (var i = 0; i < num_edges; ++i){
       if ((edges[i].v1 == v1 && edges[i].v2 == v2) ||
-          (edges[i].v2 == v1 && edges[i].v1 == v2))
-        return;
+          (edges[i].v2 == v1 && edges[i].v1 == v2)){
+            if (toggle == 1){
+              remove_edge(edges[i]);
+            }
+            return;
+          }
     }
   }
 
@@ -265,7 +269,18 @@ function petersen(){
   write_command();
 }
 
-// TODO this is the only remainy function using A
+function complement(){
+  /* Make all edges; toggle existing */
+  for (var i = 0; i < n; ++i){
+    for (var j = i + 1; j < n; ++j){
+      make_edge(vertices[i], vertices[j], 1, 1);
+    }
+  }
+  write_command();
+  redraw_graph();
+}
+
+// TODO this is the only remaining function using A
 function complete(){
   for (var i = 0; i < n - 1; ++i){
     for (var j = i + 1; j < n; ++j){

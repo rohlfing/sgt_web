@@ -74,6 +74,7 @@ int main(int argc, char* argv[]){
   char graph;
   int* degrees;
   int* distances;
+  char is_int, *format;
   graph_t g;
   matrix_e matrix;
   gsl_eigen_symm_workspace *w_s;
@@ -156,14 +157,13 @@ int main(int argc, char* argv[]){
 
   /* Calculate eigenvalues of L */
   else if (matrix == LAPLACIAN) {
-    L = A; /* Purely for ease of reading */
-    gsl_matrix_scale(L, -1);
+    gsl_matrix_scale(A, -1);
     for (i = 0; i < n; ++i){
-      gsl_matrix_set(L, i, i, degrees[i]);
+      gsl_matrix_set(A, i, i, degrees[i]);
     }
     
     w_s = gsl_eigen_symm_alloc(n);
-    gsl_eigen_symm(L, eigenvalues, w_s);
+    gsl_eigen_symm(A, eigenvalues, w_s);
     gsl_eigen_symm_free(w_s);
 
     print_evals(eigenvalues, n, 1, 0);
@@ -171,26 +171,13 @@ int main(int argc, char* argv[]){
 
   /* Calculate eigenvalues of Normalized Laplacian */
   else if (matrix == NORMALIZED) {
-    /* Get identity matrix I */
-    I = gsl_matrix_alloc(n, n);
-    gsl_matrix_set_identity(I);
-
-    /* Get diagonal matrix D_inv */
-    D_inv = gsl_matrix_calloc(n, n);
-    for (i = 0; i < n; ++i){
-      gsl_matrix_set(D_inv, i, i, degrees[i] ? 1.0 / degrees[i] : 0);
-    }
-
-    /* Allocate ~L, normalized Laplacian */
-    L = gsl_matrix_alloc(n, n);
-
     /* Compute ~L */
     for (i = 0; i < n; ++i){
       for (j = 0; j < n; ++j){
         new_element  = gsl_matrix_get(A, i, j);
         new_element *= degrees[j] ? 1.0/degrees[j] : 0;
         new_element  = degrees[j] ? ((i == j) - new_element) : 0;
-        gsl_matrix_set(L, i, j, new_element);
+        gsl_matrix_set(A, i, j, new_element);
       }
     }
 
@@ -198,11 +185,8 @@ int main(int argc, char* argv[]){
     complex_eigenvalues = gsl_vector_complex_alloc(n);
 
     w_ns = gsl_eigen_nonsymm_alloc(n);
-    gsl_eigen_nonsymm(L, complex_eigenvalues, w_ns);
+    gsl_eigen_nonsymm(A, complex_eigenvalues, w_ns);
     gsl_eigen_nonsymm_free(w_ns);
-    gsl_matrix_free(L);
-    gsl_matrix_free(I);
-    gsl_matrix_free(D_inv);
 
     eigenvalues_view = gsl_vector_complex_real(complex_eigenvalues);
 
@@ -251,6 +235,33 @@ int main(int argc, char* argv[]){
     gsl_eigen_symm_free(w_s);
     print_evals(eigenvalues, n, 0, 1);
   }
+
+  switch(matrix){
+    case ADJACENCY:
+    case LAPLACIAN:
+    case DISTANCE:
+      is_int = 1;
+      break;
+    case NORMALIZED:
+    case FLIPPED:
+      is_int = 0;
+      break;
+  }
+
+#if DEBUG
+  printf("<table style=\"text-align:right;\">");
+  for (i = 0; i < n; ++i){
+    printf("<tr>");
+    for (j = 0; j < n; ++j){
+      if (is_int)
+        printf("<td>%d</td>", (int) gsl_matrix_get(A, i, j));
+      else
+        printf("<td>%lf</td>", (double) gsl_matrix_get(A, i, j));
+    }
+    printf("</tr>\n");
+  }
+  printf("</table>\n");
+#endif
 
   gsl_matrix_free(A);
   free(degrees);
