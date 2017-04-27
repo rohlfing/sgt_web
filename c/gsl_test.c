@@ -1,6 +1,7 @@
 #include <gsl/gsl_eigen.h>
 #define N 5
 
+/* Short program to test usage of GSL functions */
 int main(int argc, char* argv[]){
   int i, j;
   int C5[N][N] =

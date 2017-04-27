@@ -1,5 +1,7 @@
 #include <gsl/gsl_eigen.h>
+#include <gsl/gsl_sort_vector.h>
 #include <math.h>
+#include <string.h>
 #include "graph.h"
 
 #define DEBUG 0
@@ -8,15 +10,21 @@
 #define EINSUFFINPUT 2
 #define EBADSIZE     4
 #define ENOSUCHVTX   8
+#define ETOOBIG     16
 #define TOLERANCE 0.0001
 
+#define MATRICES \
+  X(ADJACENCY) \
+  X(LAPLACIAN) \
+  X(SIGNLESS) \
+  X(NORMALIZED) \
+  X(DISTANCE) \
+  X(FLIPPED)
+
 typedef enum {
-  ADJACENCY,
-  LAPLACIAN,
-  SIGNLESS,
-  NORMALIZED,
-  DISTANCE,
-  FLIPPED
+#define X(M) M,
+  MATRICES
+#undef X
 } matrix_e;
 
 void print_individual(double value, int mult){
@@ -75,12 +83,11 @@ int main(int argc, char* argv[]){
   char graph;
   int* degrees;
   int* distances;
-  char is_int, *format;
   graph_t g;
   matrix_e matrix;
   gsl_eigen_symm_workspace *w_s;
   gsl_eigen_nonsymm_workspace *w_ns;
-  gsl_matrix *A, *I, *D_inv, *L;
+  gsl_matrix *A;
   gsl_vector *eigenvalues;
   gsl_vector_complex *complex_eigenvalues;
   gsl_vector_view eigenvalues_view;
@@ -91,29 +98,22 @@ int main(int argc, char* argv[]){
   /* Determine the necessary matrix type */
   graph = 0;
   scanf(" %s", matrix_type);
-  if (!strcmp("adjacency", matrix_type)){
-    matrix = ADJACENCY;
-  }
-  else if (!strcmp("laplacian", matrix_type)){
-    matrix = LAPLACIAN;
-  }
-  else if (!strcmp("signless", matrix_type)){
-    matrix = SIGNLESS;
-  }
-  else if (!strcmp("normalized", matrix_type)){
-    matrix = NORMALIZED;
-  }
-  else if (!strcmp("distance", matrix_type)){
-    matrix = DISTANCE;
-    graph  = 1;
-  }
-  else if (!strcmp("flipped", matrix_type)){
-    matrix = FLIPPED;
-    graph  = 1;
-  }
-  else{
+
+
+  /* Assign matrix_type enum */
+#define X(M) if(!strcmp(#M, matrix_type)){ \
+               matrix = M; \
+             } else
+  MATRICES
+#undef X
+  {
     printf("Error: Unsupported matrix type\n");
     return EMATRIXTYPE;
+  }
+
+  /* Determine if a graph representation should be made */
+  if (matrix == DISTANCE || matrix == FLIPPED){
+    graph = 1;
   }
 
   /* Get number of vertices and edges */
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]){
   if (n <= 0) return EBADSIZE;
   if (n > 256){
     printf("Too many vertices: current limit is 256.\n");
-    return 0;
+    return ETOOBIG;
   }
 
   /* Make graph if necessary */
@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
   A = gsl_matrix_calloc(n, n);
   degrees = calloc(n, sizeof(int));
 
-  /* Scan in edges */
+  /* Scan in edges as adjacency matrix */
   while(scanf(" %d %d", &x, &y) == 2){
     if (x < 0 || y < 0 || x >= n || y >= n){
       printf("Error: Bad edge");
@@ -253,31 +253,35 @@ int main(int argc, char* argv[]){
     print_evals(eigenvalues, n, 0, 1);
   }
 
-  switch(matrix){
-    case ADJACENCY:
-    case LAPLACIAN:
-    case DISTANCE:
-      is_int = 1;
-      break;
-    case NORMALIZED:
-    case FLIPPED:
-      is_int = 0;
-      break;
-  }
-
 #if DEBUG
-  printf("<table style=\"text-align:right;\">");
-  for (i = 0; i < n; ++i){
-    printf("<tr>");
-    for (j = 0; j < n; ++j){
-      if (is_int)
-        printf("<td>%d</td>", (int) gsl_matrix_get(A, i, j));
-      else
-        printf("<td>%lf</td>", (double) gsl_matrix_get(A, i, j));
+  {
+    char is_int;
+
+    switch(matrix){
+      case ADJACENCY:
+      case LAPLACIAN:
+      case DISTANCE:
+        is_int = 1;
+        break;
+      case NORMALIZED:
+      case FLIPPED:
+        is_int = 0;
+        break;
     }
-    printf("</tr>\n");
+
+    printf("<table style=\"text-align:right;\">");
+    for (i = 0; i < n; ++i){
+      printf("<tr>");
+      for (j = 0; j < n; ++j){
+        if (is_int)
+          printf("<td>%d</td>", (int) gsl_matrix_get(A, i, j));
+        else
+          printf("<td>%lf</td>", (double) gsl_matrix_get(A, i, j));
+      }
+      printf("</tr>\n");
+    }
+    printf("</table>\n");
   }
-  printf("</table>\n");
 #endif
 
   gsl_matrix_free(A);

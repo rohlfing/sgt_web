@@ -1,5 +1,5 @@
 <?php
-function valid_chars($string){
+function valid_ints($string){
   $len = strlen($string);
 
   for($i = 0; $i < $len; ++$i){
@@ -16,7 +16,7 @@ function valid_matrix($string){
 
   for($i = 0; $i < $len; ++$i){
     $c = $string[$i];
-    if (!((ord($c) >= ord("a")) && (ord($c) <= ord("z")))){
+    if (!((ord($c) >= ord("A")) && (ord($c) <= ord("Z")))){
       return False;
     }
   }
@@ -33,7 +33,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
   /* Log all computed matrices */
   //error_log($term_command);  
 
-  if(valid_chars($num_vert) && valid_chars($edges) && valid_matrix($matrix)){
+  if(valid_ints($num_vert) && valid_ints($edges) && valid_matrix($matrix)){
     system($term_command);
   }
   else{

@@ -1,10 +1,15 @@
 #include "graph.h"
 
+/*
+ * Given a graph_t object, initialize it with n vertices and 0 edges
+ */
 void graph_init(graph_t* g, int n){
   int i;
 
   g->n = n;
   g->m = 0;
+  /* Allocate all data structures */
+  /* TODO check for malloc failure */
   g->edges = malloc(g->n * sizeof(int*));
   g->num_edges = malloc(g->n * sizeof(int));
   g->max_edges = malloc(g->n * sizeof(int));
@@ -15,18 +20,23 @@ void graph_init(graph_t* g, int n){
   }
 }
 
-/* Adds edge from v1 to v2; assumes valid input */
+/*
+ * Adds edge from v1 to v2; assumes valid input
+ */
 void add_edge(graph_t* g, int v1, int v2){
   if (g->num_edges[v1] == g->max_edges[v1]){
     g->max_edges[v1] *= 2;
     g->edges[v1] = realloc(g->edges[v1], g->max_edges[v1] * sizeof(int));
-    // TODO handle realloc failing
+    /* TODO handle realloc failing */
   }
 
   g->edges[v1][g->num_edges[v1]] = v2;
   ++(g->num_edges[v1]);
 }
 
+/*
+ * Checks input validity, calls add_edge in both directions 
+ */
 void graph_add_edge(graph_t* g, int v1, int v2){
   if (v1 < 0 || v2 < 0 || v1 >= g->n || v2 >= g->n){
     return;
@@ -37,6 +47,9 @@ void graph_add_edge(graph_t* g, int v1, int v2){
   add_edge(g, v2, v1);
 }
 
+/*
+ * Recursive helper method for BFS traversal
+ */
 void bfs_recursive(graph_t* g, int v, int* distances, int* vtx_q, int head, int tail, void (*action)(int)){
   int i;
 
@@ -61,6 +74,10 @@ void bfs_recursive(graph_t* g, int v, int* distances, int* vtx_q, int head, int 
   }
 }
 
+/* 
+ * Runs a BFS on g from vertex v, calliing action(i) on each visited
+ * When complete, distances[i] is dist(v, i) or -1 if ther is no path.
+ */
 void graph_bfs(graph_t* g, int v, int* distances, void (*action)(int)){
   int* vtx_q;
   int i;
@@ -78,6 +95,10 @@ void graph_bfs(graph_t* g, int v, int* distances, void (*action)(int)){
   free(vtx_q);
 }
 
+/*
+ * Runs a BFS on g from vertex v, calliing action(i) on each visited
+ * When complete, visited[i] is 1 if there's a path from v to i.
+ */
 void dfs(graph_t* g, int v, char* visited, void (*action)(int)){
   int i;
 
@@ -94,6 +115,9 @@ void dfs(graph_t* g, int v, char* visited, void (*action)(int)){
   }
 }
 
+/*
+ * Calls dfs(), disregards visited[]
+ */
 void graph_dfs(graph_t* g, int v, void (*action)(int)){
   char* visited;
 
@@ -102,6 +126,9 @@ void graph_dfs(graph_t* g, int v, void (*action)(int)){
   free(visited);
 }
 
+/*
+ * Calls dfs(), returns true if all vertices connected
+ */
 int graph_is_connected(graph_t* g){
   int i;
   char* visited;
@@ -122,6 +149,9 @@ int graph_is_connected(graph_t* g){
   return 1;
 }
 
+/* 
+ * Frees internal memory used by graph, but not g itself
+ */
 void graph_free(graph_t* g){
   int i;
 
