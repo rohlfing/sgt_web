@@ -13,6 +13,7 @@
 typedef enum {
   ADJACENCY,
   LAPLACIAN,
+  SIGNLESS,
   NORMALIZED,
   DISTANCE,
   FLIPPED
@@ -96,6 +97,9 @@ int main(int argc, char* argv[]){
   else if (!strcmp("laplacian", matrix_type)){
     matrix = LAPLACIAN;
   }
+  else if (!strcmp("signless", matrix_type)){
+    matrix = SIGNLESS;
+  }
   else if (!strcmp("normalized", matrix_type)){
     matrix = NORMALIZED;
   }
@@ -158,6 +162,19 @@ int main(int argc, char* argv[]){
   /* Calculate eigenvalues of L */
   else if (matrix == LAPLACIAN) {
     gsl_matrix_scale(A, -1);
+    for (i = 0; i < n; ++i){
+      gsl_matrix_set(A, i, i, degrees[i]);
+    }
+    
+    w_s = gsl_eigen_symm_alloc(n);
+    gsl_eigen_symm(A, eigenvalues, w_s);
+    gsl_eigen_symm_free(w_s);
+
+    print_evals(eigenvalues, n, 1, 0);
+  }
+
+  /* Calculate eigenvalues of Q */
+  else if (matrix == SIGNLESS) {
     for (i = 0; i < n; ++i){
       gsl_matrix_set(A, i, i, degrees[i]);
     }

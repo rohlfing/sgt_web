@@ -16,11 +16,14 @@
         Ctrl+click on a vertex will remove a vertex and all incident edges.
         Ctrl+click near the midpoint of an edge will remove the edge.
         <br /><br />
+        <button onclick="graph6()">Get Sage Input</button> <code id="graph6"></code>
+        <br /><br />
         
         <form method="POST" action="php/compute.php" id="adjacencySpectraForm" target="aSpectra">
           <!-- Radio button options -->
           <input type="radio" name="matrix" value="adjacency" checked /><b>A</b>djacency<br />
           <input type="radio" name="matrix" value="laplacian" /><b>L</b>aplacian<br />
+          <input type="radio" name="matrix" value="signless" />Signless Laplacian (<b>Q</b>)<br />
           <input type="radio" name="matrix" value="normalized" />Normalized <b>&Lfr;</b>aplacian<br />
           <input type="radio" name="matrix" value="distance" /><b>&Dfr;</b>istance<br />
           <input type="radio" name="matrix" value="flipped" /><div class="flip"><b>&Dfr;</b></div>istance (flipped)<br />

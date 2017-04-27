@@ -7,6 +7,8 @@ var form_nvert  = document.getElementById('formNumVert');
 form_edges.value = "";
 form_nvert.value = "";
 
+var html_graph6 = document.getElementById('graph6');
+
 /* State variables */
 var prev = null;
 var clicked = 0;
@@ -18,6 +20,83 @@ var n = 0;
 var num_edges = 0;
 var adjacency = []; /* Adjacency Matrix of graph */
 
+/******************************************
+ * graph6 format functions                *
+ ******************************************/
+/* Escape all backslashes */
+function character(n){
+  var result = "";
+
+  result += String.fromCharCode(n);
+  if (result == "\\")
+    result += result;
+
+  return result;
+}
+
+/* Compute N(n), where n = |V| */
+function N(){
+  var result = "";
+
+  if (n < 63) {
+    result += character(63 + n);
+  }
+  else if (n < 258047){
+    result += character(126);
+    result += character(63 + ((n >> 12) & 0x3F));
+    result += character(63 + ((n >>  6) & 0x3F));
+    result += character(63 + ((n >>  0) & 0x3F));
+  }
+  else{
+    alert("I don't know how you made that big of a graph, but that's too many vertices");
+  }
+
+  return result;
+}
+
+/* Compute R(x), where x is bit array of A */
+function R(){
+  var result = "";
+  var bitarr_len = n * (n - 1) / 2;
+  var bit_pos;
+  var to_byte;
+  var offset = bitarr_len % 6;
+
+  /* Calc right-padded 0s */
+  if (offset != 0)
+    offset = 6 - offset;
+
+  bit_pos = 5;
+  to_byte = 0;
+  for (var j = 1; j < n; ++j){
+    for (var i = 0; i < j; ++i){
+      console.log("Pair: (" + i + ", " + j + ")");
+      if (bit_pos < 0){
+        console.log(to_byte);
+        result += character(to_byte + 63);
+        bit_pos = 5;
+        to_byte = 0;
+      }
+      to_byte |= adjacency[i][j] ? (1 << bit_pos) : 0;
+      console.log("A[i][j] = " + adjacency[i][j]);
+      console.log(to_byte + "\n");
+      --bit_pos;
+    }
+  }
+
+  result += character(to_byte + 63);
+
+  return result;
+}
+
+/* Create graph6 representation of G */
+function graph6(){
+  html_graph6.innerHTML = "Graph('" + N() + R() + "')";
+}
+
+/******************************************
+ * Graph construction & drawing functions *
+ ******************************************/
 function draw_vertex(x, y, color){
   var c = graphContext;
   c.beginPath();
