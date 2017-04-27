@@ -70,16 +70,12 @@ function R(){
   to_byte = 0;
   for (var j = 1; j < n; ++j){
     for (var i = 0; i < j; ++i){
-      console.log("Pair: (" + i + ", " + j + ")");
       if (bit_pos < 0){
-        console.log(to_byte);
         result += character(to_byte + 63);
         bit_pos = 5;
         to_byte = 0;
       }
       to_byte |= adjacency[i][j] ? (1 << bit_pos) : 0;
-      console.log("A[i][j] = " + adjacency[i][j]);
-      console.log(to_byte + "\n");
       --bit_pos;
     }
   }
